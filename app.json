@@ -1,0 +1,8 @@
+{
+    "name":"Any-Tune",
+    "description":"Node js server listen any music any where",
+    "repository":"https://github.com/sushantlp/any-tune-server.git",
+    "logo":"http://node-js-sample.herokuapp.com/node.svg",
+    "keywords":["node","express","static"],
+    "image":"heroku/nodejs"
+}

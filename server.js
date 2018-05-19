@@ -49,6 +49,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //app.use("/api", jsonWebToken.verifyJsonWebToken);
 
+// Index Route
+app.get("/", youtube.requestPlaylistData);
+
 // Version 1 API
 app.group("/api/v1", router => {
   // Youtube Search API
