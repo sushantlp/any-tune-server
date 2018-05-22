@@ -1,18 +1,10 @@
 "use strict";
 
-const youtube = require("youtube-search");
-const dotEnv = require("dotenv");
+// Import Package
+const circularJSON = require("circular-json");
 
-// Load Environment Variables.
-dotEnv.load({ path: ".env" });
-
-// Youtube Parameter
-const paramater = {
-  maxResults: 20,
-  key: process.env.YOUTUBE_API_KEY,
-  channel:
-    "https://www.youtube.com/playlist?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI"
-};
+// Import Controllers
+const api = require("./networkController");
 
 // Youtube Playlist Data
 const playlist = {
@@ -45,9 +37,23 @@ module.exports.requestSearchData = (req, res) => {
     // Extract Parameter
     const search = req.query.type;
 
-    return commaSeparatedParameter(search).then(result => {
-      return res.status(200).send(result);
-    });
+    // Youtube Search API Call
+    return api
+      .youtubeSearchCall(search)
+      .then(result => {
+        // Create Search JSON
+        const json = createSearchJson(result.data.items);
+
+        /*return res
+        .status(200)
+        .send(createJsonObject(result, "api/v1/search", 200, 10)); */
+        return res.status(200).send(json);
+      })
+      .catch(error => {
+        return res
+          .status(400)
+          .send(circularJSON.stringify(error.response.statusText));
+      });
   } else {
     return res.status(400).send("Not a good api call");
   }
@@ -80,7 +86,7 @@ module.exports.requestTrendingData = (req, res) => {
 };
 
 // Call Youtube API
-const callYoutubeAPI = type => {
+/*const callYoutubeAPI = type => {
   return new Promise(function(resolve, reject) {
     youtube(type, paramater, function(err, results) {
       if (err) {
@@ -89,7 +95,7 @@ const callYoutubeAPI = type => {
       return resolve(results);
     });
   });
-};
+}; */
 
 // Comma Separated Parameter
 const commaSeparatedParameter = async search => {
@@ -97,9 +103,9 @@ const commaSeparatedParameter = async search => {
   let dataArray = [];
   let param = search.split(",");
   const youtube = param.map(async (val, i) => {
-    return await callYoutubeAPI(val).then(result => {
+    /*return await callYoutubeAPI(val).then(result => {
       return result;
-    });
+    });*/
   });
 
   return await Promise.all(youtube).then(result => {
@@ -115,4 +121,24 @@ const createJsonObject = (data, location, code, metadata) => {
     status: code,
     metadata: metadata
   });
+};
+
+// Create Search JSON
+const createSearchJson = json => {
+  // Variable
+  let arr = [];
+  for (let i = 0; i < json.length; i++) {
+    // Block Variable
+    let obj = {};
+    obj.publishedAt = json[i].snippet.publishedAt;
+    obj.title = json[i].snippet.title;
+    obj.description = json[i].snippet.description;
+    obj.thumbnails = json[i].snippet.thumbnails.high.url;
+    obj.channelTitle = json[i].snippet.channelTitle;
+
+    // Push Array
+    arr.push(obj);
+  }
+
+  return arr;
 };
