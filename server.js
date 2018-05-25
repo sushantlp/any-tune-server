@@ -62,6 +62,14 @@ app.group("/api/v1", router => {
 
   // Youtube Trending API
   router.get("/trending", youtube.requestTrendingData);
+
+  router.get("/stream", youtube.requestStreamData);
+
+  // Youtube Related Video Search
+  router.get("/suggest", youtube.requestRelatedData);
+
+  // Youtube Audio Download
+  router.get("/download", youtube.requestRelatedData);
 });
 
 // Call Mysql Connection Object
