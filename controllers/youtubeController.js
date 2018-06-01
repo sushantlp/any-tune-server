@@ -202,8 +202,8 @@ const createSearchJson = async (json, status) => {
     obj.publishedAt = json[i].snippet.publishedAt;
     obj.title = json[i].snippet.title;
     obj.description = json[i].snippet.description;
-    obj.thumbnails = json[i].snippet.thumbnails.high.url;
-    obj.channelTitle = json[i].snippet.channelTitle;
+    obj.thumb = json[i].snippet.thumbnails.medium.url;
+    obj.uploader = json[i].snippet.channelTitle;
 
     if (status == 1) {
       videoId = json[i].id.videoId;
@@ -219,8 +219,8 @@ const createSearchJson = async (json, status) => {
         const data = result.data.items;
         for (let j = 0; j < data.length; j++) {
           obj.duration = data[j].contentDetails.duration;
-          obj.viewCount = data[j].statistics.viewCount;
-          obj.videoId = data[j].id;
+          obj.views = data[j].statistics.viewCount;
+          obj.id = data[j].id;
           obj.suggest_url = `api/v1/suggest?url=${data[j].id}`;
           obj.stream_url = `api/v1/stream?url=${data[j].id}`;
           obj.get_url = `api/v1/download?url=${data[j].id}`;
