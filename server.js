@@ -12,6 +12,7 @@ const path = require("path");
 const expressValidator = require("express-validator");
 const expressStatusMonitor = require("express-status-monitor");
 const sass = require("node-sass-middleware");
+const favicon = require("serve-favicon");
 //const jsonWebToken = require("./middleware/jsonwebtoken");
 
 require("express-group-routes");
@@ -46,6 +47,7 @@ app.use(
 );
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //app.use("/api", jsonWebToken.verifyJsonWebToken);
 
