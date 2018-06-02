@@ -24,7 +24,7 @@ dotEnv.load({ path: ".env" });
 const app = express();
 
 // Controllers (route handlers).
-const database = require("./controllers/databaseController");
+//const database = require("./controllers/databaseController");
 const youtube = require("./controllers/youtubeController");
 
 // Use morgan to log requests to the console
@@ -75,10 +75,10 @@ app.group("/api/v1", router => {
 });
 
 // Call Mysql Connection Object
-database.mysqlConnect();
+//database.mysqlConnect();
 
 // Call Sequelize Connection
-database.sequelizeConnection();
+//database.sequelizeConnection();
 
 // Error Handler.
 app.use(errorHandler());
