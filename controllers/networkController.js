@@ -9,7 +9,7 @@ const SEARCH_API = "https://www.googleapis.com/youtube/v3/search?";
 const VIDEO_PLAYLIST_API =
   "https://www.googleapis.com/youtube/v3/playlistItems?";
 const VIDEO_DETAIL_API = "https://www.googleapis.com/youtube/v3/videos?";
-const MAX_RESULT = 1;
+const MAX_RESULT = 5;
 
 // Load Environment Variables.
 dotEnv.load({ path: ".env" });
