@@ -2,17 +2,16 @@
 
 // Module Dependencies.
 const express = require("express");
-//const session = require("express-session");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const errorHandler = require("errorhandler");
 const dotEnv = require("dotenv");
-//const flash = require("express-flash");
 const path = require("path");
 const expressValidator = require("express-validator");
 const expressStatusMonitor = require("express-status-monitor");
 const sass = require("node-sass-middleware");
 const favicon = require("serve-favicon");
+const robots = require("express-robots");
 //const jsonWebToken = require("./middleware/jsonwebtoken");
 
 require("express-group-routes");
@@ -24,7 +23,7 @@ dotEnv.load({ path: ".env" });
 const app = express();
 
 // Controllers (route handlers).
-//const database = require("./controllers/databaseController");
+const database = require("./controllers/databaseController");
 const youtube = require("./controllers/youtubeController");
 
 // Use morgan to log requests to the console
@@ -48,17 +47,24 @@ app.use(
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
+app.use(robots(path.join(__dirname, "public", "/robots.txt")));
+app.disable("etag");
 
 //app.use("/api", jsonWebToken.verifyJsonWebToken);
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 
 // Index Route
-app.get("/", youtube.requestPlaylistData);
+app.get("/", (req, res) => {
+  res.status(200).send("welcome to this API");
+});
 
 // Version 1 API
 app.group("/api/v1", router => {
@@ -81,10 +87,10 @@ app.group("/api/v1", router => {
 });
 
 // Call Mysql Connection Object
-//database.mysqlConnect();
+database.mysqlConnect();
 
 // Call Sequelize Connection
-//database.sequelizeConnection();
+database.sequelizeConnection();
 
 // Error Handler.
 app.use(errorHandler());

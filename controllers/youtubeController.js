@@ -5,10 +5,10 @@ const circularJSON = require("circular-json");
 
 // Import Controllers
 const api = require("./networkController");
-//const logic = require("./logicController");
+const database = require("./databaseController");
 
 // Youtube Playlist Data
-const playlist = {
+/*const playlist = {
   Popular:
     "https://www.youtube.com/playlist?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI",
   Latest:
@@ -30,7 +30,7 @@ const playlist = {
   Pop_Hotlist:
     "https://www.youtube.com/playlist?list=PLFgquLnL59altZg1f_Kr1kGUYE6j-NE0M",
   Most_Viewed: "https://www.youtube.com/playlist?list=PL8A83124F1D79BD4F"
-};
+}; */
 
 // Request Youtube Search Data
 module.exports.requestSearchData = (req, res) => {
@@ -73,17 +73,24 @@ module.exports.requestPlaylistData = (req, res) => {
   // Varibale
   let metadata = {};
 
-  const convertArray = Object.entries(playlist).map(([playlist, url]) => ({
+  /*const convertArray = Object.entries(playlist).map(([playlist, url]) => ({
     playlist,
     url
-  }));
+  })); */
 
-  // Intialize
-  metadata = { count: convertArray.length };
+  return database
+    .getPlaylistData(1)
+    .then(result => {
+      // Intialize
+      metadata = { count: result.length };
 
-  return res
-    .status(200)
-    .send(createJsonObject(convertArray, "api/v1/playlist", 200, metadata));
+      return res
+        .status(200)
+        .send(createJsonObject(result, "api/v1/playlist", 200, metadata));
+    })
+    .catch(error => {
+      return res.status(400).send("Oops our bad!!!");
+    });
 };
 
 // Request Youtube Trending Data

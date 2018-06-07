@@ -21,7 +21,7 @@ const now = moment()
 
 // Mysql Connection Object
 module.exports.mysqlConnect = () => {
-  const connect = mysql.createConnection({
+  return mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
     port: process.env.DB_PORT,
@@ -29,8 +29,6 @@ module.exports.mysqlConnect = () => {
     database: process.env.DB_DATABASE,
     Promise: bluebird
   });
-
-  return connect;
 };
 
 // Call Mysql Connection Function
@@ -69,6 +67,18 @@ module.exports.sequelizeConnection = () => {
 /**
  * Start Database Read and Write
  */
+
+// Get Youtube Playlist Data
+module.exports.getPlaylistData = async status => {
+  try {
+    // Query
+    const query = "SELECT * FROM `playlists` WHERE `status`=?";
+
+    return await mysqlObject.execute(query, [status]);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 /**
  * End Database Read and Write
