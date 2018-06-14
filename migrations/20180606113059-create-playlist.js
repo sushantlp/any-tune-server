@@ -17,7 +17,7 @@ module.exports = {
       },
       status: {
         type: Sequelize.BOOLEAN,
-        defaultValue: 0
+        defaultValue: 1
       },
       createdAt: {
         field: "created_at",

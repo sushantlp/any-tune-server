@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   var YoutubeCollection = sequelize.define(
     "youtube_collections",
     {
-      youtube_id: DataTypes.INTEGER,
+      youtube_id: DataTypes.STRING,
       playlist_id: DataTypes.INTEGER,
       title: DataTypes.STRING,
       description: DataTypes.TEXT,

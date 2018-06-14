@@ -6,6 +6,7 @@ const circularJSON = require("circular-json");
 // Import Controllers
 const api = require("./networkController");
 const database = require("./databaseController");
+const share = require("./shareController");
 
 // Youtube Playlist Data
 /*const playlist = {
@@ -43,7 +44,8 @@ module.exports.requestSearchData = (req, res) => {
       .youtubeSearchCall(search)
       .then(result => {
         // Create Search JSON
-        createSearchJson(result.data.items, 1)
+        return share
+          .createSearchJson(result.data.items, 1)
           .then(result => {
             // Intialize
             const metadata = { count: result.length, type: search };
@@ -53,12 +55,12 @@ module.exports.requestSearchData = (req, res) => {
               .send(createJsonObject(result, "api/v1/search", 200, metadata));
           })
           .catch(error => {
-            return res.status(400).send("Oops our bad!!!");
+            return res.status(500).send("Oops our bad!!!");
           });
       })
       .catch(error => {
         return res
-          .status(400)
+          .status(500)
           .send(
             "Oops our bad!!!" /*circularJSON.stringify(error.response.statusText)*/
           );
@@ -68,18 +70,13 @@ module.exports.requestSearchData = (req, res) => {
   }
 };
 
-// Request Youtube Playlist Data
+// Request Youtube Playlist All Data
 module.exports.requestPlaylistData = (req, res) => {
   // Varibale
   let metadata = {};
 
-  /*const convertArray = Object.entries(playlist).map(([playlist, url]) => ({
-    playlist,
-    url
-  })); */
-
   return database
-    .getPlaylistData(1)
+    .readAllPlaylistData("playlist_name AS playlist,playlist_url AS url", 1)
     .then(result => {
       // Intialize
       metadata = { count: result.length };
@@ -99,7 +96,8 @@ module.exports.requestTrendingData = (req, res) => {
     // Extract Parameter
     const search = req.query.type;
 
-    return commaSeparatedParameter(search)
+    // Logic Trending Data
+    return logicTrendingData(search)
       .then(result => {
         // Intialize
         let metadata = { count: Object.keys(result).length, type: search };
@@ -109,7 +107,6 @@ module.exports.requestTrendingData = (req, res) => {
           .send(createJsonObject(result, "api/v1/trending", 200, metadata));
       })
       .catch(error => {
-        console.log(error);
         return res.status(400).send("Oops our bad!!!");
       });
   } else {
@@ -151,95 +148,53 @@ const createJsonObject = (data, location, code, metadata) => {
   });
 };
 
-// Comma Separated Parameter
-const commaSeparatedParameter = async search => {
-  // Variable
-  let dataObject = {};
-  let param = search.split(",");
+// Logic Trending Data
+const logicTrendingData = async search => {
+  try {
+    // Variable
+    let dataObject = {};
+    let params = search.split(",");
 
-  const youtube = param.map(async (val, i) => {
-    // Block Variable
-    let playlistId = undefined;
-    let underscore = undefined;
-    for (let play in playlist) {
-      underscore = val.replace(/ /g, "_");
-      if (play == underscore) {
-        let playArray = playlist[play].split("list=");
-        playlistId = playArray[1];
-        break;
-      }
-    }
+    // Read Youtube Playlist All Data
+    const playlistData = await database.readAllPlaylistData(
+      "playlist_id,playlist_name",
+      1
+    );
 
-    // Check Value Undefined
-    if (typeof playlistId !== undefined) {
-      // Youtube Playlist Video Call
-      return await api
-        .youtubePlaylistVideo(playlistId)
-        .then(result => {
-          // Create Search JSON
-          return createSearchJson(result.data.items, 2)
-            .then(result => {
-              return (dataObject[underscore] = result);
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-    }
-  });
+    // Iterate Param Data
+    const youtube = params.map(async (param, i) => {
+      let playlistId = 0;
+      let playlistName = "";
 
-  return await Promise.all(youtube).then(result => {
-    return Promise.resolve(dataObject);
-  });
-};
+      // Iterate Database Data
+      for (let i = 0; i < playlistData.length; i++) {
+        playlistName = playlistData[i].playlist_name.replace(/ /g, "_");
+        //let decodeParam = decodeURI(param).replace(/\s/g, "");
+        let decodeParam = decodeURI(param).replace(/ /g, "_");
 
-// Create Search JSON
-const createSearchJson = async (json, status) => {
-  // Variable
-  let arr = [];
-
-  for (let i = 0; i < json.length; i++) {
-    // Block Variable
-    let obj = {};
-    let videoId = undefined;
-
-    obj.publishedAt = json[i].snippet.publishedAt;
-    obj.title = json[i].snippet.title;
-    obj.description = json[i].snippet.description;
-    obj.thumb = json[i].snippet.thumbnails.medium.url;
-    obj.uploader = json[i].snippet.channelTitle;
-
-    if (status == 1) {
-      videoId = json[i].id.videoId;
-    } else {
-      videoId = json[i].snippet.resourceId.videoId;
-    }
-
-    // Youtube Video Detail API Call
-    await api
-      .youtubeVideoCall(videoId)
-      .then(result => {
-        // Variable
-        const data = result.data.items;
-        for (let j = 0; j < data.length; j++) {
-          obj.duration = data[j].contentDetails.duration;
-          obj.views = data[j].statistics.viewCount;
-          obj.id = data[j].id;
-          obj.suggest_url = `api/v1/suggest?url=${data[j].id}`;
-          obj.stream_url = `api/v1/stream?url=${data[j].id}`;
-          obj.get_url = `api/v1/download?url=${data[j].id}`;
-          //obj.stream = data[j].player;
-
-          // Push Array
-          arr.push(obj);
+        if (decodeParam == playlistName) {
+          playlistId = playlistData[i].playlist_id;
+          break;
         }
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+      }
+
+      if (playlistId > 0) {
+        //playlistName = playlistName.replace(/_/g, " ");
+        let read = await database.readYoutubeDataById(
+          "youtube_id,title,description,thumb,uploader,duration,views",
+          playlistId,
+          1
+        );
+
+        // Youtube Trending Json
+        dataObject[playlistName] = share.youtubeJsonCreate(read);
+      }
+    });
+
+    return Promise.all(youtube).then(res => {
+      return Promise.resolve(dataObject);
+    });
+  } catch (error) {
+    return Promise.reject(error);
   }
-  return Promise.resolve(arr);
 };

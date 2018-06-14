@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       youtube_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       playlist_id: {
@@ -47,7 +47,7 @@ module.exports = {
       },
       status: {
         type: Sequelize.BOOLEAN,
-        defaultValue: 0
+        defaultValue: 1
       },
       createdAt: {
         field: "created_at",

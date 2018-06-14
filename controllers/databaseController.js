@@ -5,7 +5,7 @@
 "use strict";
 
 // Import
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise"); //require("mysql2");
 const dotEnv = require("dotenv");
 const Sequelize = require("sequelize");
 const bluebird = require("bluebird");
@@ -18,21 +18,6 @@ dotEnv.load({ path: ".env" });
 const now = moment()
   .tz("Asia/Kolkata")
   .format("YYYY-MM-DD HH-m-ss");
-
-// Mysql Connection Object
-module.exports.mysqlConnect = () => {
-  return mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USERNAME,
-    port: process.env.DB_PORT,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    Promise: bluebird
-  });
-};
-
-// Call Mysql Connection Function
-const mysqlObject = this.mysqlConnect();
 
 // Sequelize Connection
 module.exports.sequelizeConnection = () => {
@@ -48,6 +33,14 @@ module.exports.sequelizeConnection = () => {
         min: 0,
         acquire: 30000,
         idle: 10000
+      },
+      dialectOptions: {
+        charset: "utf8mb4"
+      },
+      define: {
+        underscored: false,
+        freezeTableName: false,
+        timestamps: true
       }
     }
   );
@@ -68,13 +61,161 @@ module.exports.sequelizeConnection = () => {
  * Start Database Read and Write
  */
 
-// Get Youtube Playlist Data
-module.exports.getPlaylistData = async status => {
+// Read Youtube Playlist All Data
+module.exports.readAllPlaylistData = async (select, status) => {
   try {
-    // Query
-    const query = "SELECT * FROM `playlists` WHERE `status`=?";
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
 
-    return await mysqlObject.execute(query, [status]);
+    // Query
+    const query = `SELECT ${select} FROM playlists WHERE status=?`;
+
+    // Query Database
+    const [rows, fields] = await connection.execute(query, [status]);
+    return rows;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Read Youtube Playlist Data By Name
+module.exports.readPlaylistDataByName = async (select, name, status) => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
+
+    // Query
+    const query = `SELECT ${select} FROM playlists WHERE playlist_name=? AND status=? `;
+
+    // Query Database
+    const [rows, fields] = await connection.execute(query, [name, status]);
+    return rows;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Read Youtube Data By Id
+module.exports.readYoutubeDataById = async (select, playlistId, status) => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
+
+    // Query
+    const query = `SELECT ${select} FROM youtube_collections WHERE playlist_id=? AND status=? `;
+
+    // Query Database
+    const [rows, fields] = await connection.execute(query, [
+      playlistId,
+      status
+    ]);
+    return rows;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Read All Youtube Data
+module.exports.readAllYoutubeData = async (select, status) => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
+
+    // Query
+    const query = `SELECT MAX(${select}) FROM youtube_collections WHERE status=? `;
+
+    // Query Database
+    const [rows, fields] = await connection.execute(query, [
+      playlistId,
+      status
+    ]);
+    return rows;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Keep Youtube Playlist Music Detail
+module.exports.writeYoutubeDetail = async (
+  youtubeId,
+  playlistId,
+  title,
+  description,
+  thumb,
+  uploader,
+  duration,
+  views,
+  publishedAt
+) => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
+
+    // Query
+    const query =
+      "INSERT INTO `youtube_collections` (`youtube_id`, `playlist_id`, `title`, `description`, `thumb`,`uploader`,`duration`,`views`,`published_at`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+    // Query Database
+    return await connection.execute(query, [
+      youtubeId,
+      playlistId,
+      title,
+      description,
+      thumb,
+      uploader,
+      duration,
+      views,
+      publishedAt,
+      now,
+      now
+    ]);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+// Deactivate Youtube Detail
+module.exports.deactivateYoutubeBYPlaylistId = async (playlistId, status) => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      port: process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    });
+
+    // Query
+    const query =
+      "UPDATE `youtube_collections` SET `status`=?, `updated_at`=? WHERE `playlist_id`=?";
+
+    // Query Database
+    return await connection.execute(query, [status, now, playlistId]);
   } catch (error) {
     return Promise.reject(error);
   }

@@ -25,6 +25,7 @@ const app = express();
 // Controllers (route handlers).
 const database = require("./controllers/databaseController");
 const youtube = require("./controllers/youtubeController");
+const cron = require("./controllers/cronController");
 
 // Use morgan to log requests to the console
 app.use(morgan("dev"));
@@ -47,7 +48,7 @@ app.use(
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
-app.use(robots(path.join(__dirname, "public", "/robots.txt")));
+app.use(robots(path.join(__dirname, "public", "robots.txt")));
 app.disable("etag");
 
 //app.use("/api", jsonWebToken.verifyJsonWebToken);
@@ -66,6 +67,7 @@ app.get("/", (req, res) => {
   res.status(200).send("welcome to this API");
 });
 
+app.get("/demo", cron.requestCronScheduling);
 // Version 1 API
 app.group("/api/v1", router => {
   // Youtube Search API
@@ -87,7 +89,7 @@ app.group("/api/v1", router => {
 });
 
 // Call Mysql Connection Object
-database.mysqlConnect();
+//database.mysqlConnect();
 
 // Call Sequelize Connection
 database.sequelizeConnection();
