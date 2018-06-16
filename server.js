@@ -12,6 +12,7 @@ const expressStatusMonitor = require("express-status-monitor");
 const sass = require("node-sass-middleware");
 const favicon = require("serve-favicon");
 const robots = require("express-robots");
+const CronJob = require("cron").CronJob;
 //const jsonWebToken = require("./middleware/jsonwebtoken");
 
 require("express-group-routes");
@@ -67,7 +68,6 @@ app.get("/", (req, res) => {
   res.status(200).send("welcome to this API");
 });
 
-app.get("/demo", cron.requestCronScheduling);
 // Version 1 API
 app.group("/api/v1", router => {
   // Youtube Search API
@@ -112,6 +112,18 @@ if (process.env.APP_ENV.toUpperCase() == "PROD") {
     res.redirect(process.env.DEVELOPMENT_URL);
   });
 }
+
+new CronJob(
+  "30 * * * * *",
+  function() {
+    // Execute code here
+    //cron.logicCronScheduling();
+    console.log("Hello");
+  },
+  null,
+  true,
+  "Asia/Kolkata"
+);
 
 // Export
 module.exports = app;

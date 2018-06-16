@@ -17,7 +17,7 @@ module.exports.requestCronScheduling = (req, res) => {
 };
 
 // Logic Cron Scheduling
-const logicCronScheduling = async () => {
+module.exports.logicCronScheduling = async () => {
   try {
     // Read Youtube Playlist All Data
     const playlistData = await database.readAllPlaylistData(
