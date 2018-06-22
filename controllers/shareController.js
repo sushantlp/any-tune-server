@@ -21,8 +21,9 @@ module.exports.createSearchJson = async (json, status) => {
       obj.publishedAt = json[i].snippet.publishedAt;
       obj.title = json[i].snippet.title;
       obj.description = json[i].snippet.description;
-      obj.thumbnails = json[i].snippet.thumbnails.medium.url;
+      obj.thumb = json[i].snippet.thumbnails.medium.url;
       obj.channelTitle = json[i].snippet.channelTitle;
+      obj.uploader = json[i].snippet.title;
 
       if (status == 1) {
         videoId = json[i].id.videoId;
@@ -40,8 +41,8 @@ module.exports.createSearchJson = async (json, status) => {
           .asMinutes()
           .toFixed(2);
 
-        obj.viewCount = videoData.data.items[j].statistics.viewCount;
-        obj.videoId = videoData.data.items[j].id;
+        obj.views = videoData.data.items[j].statistics.viewCount;
+        obj.id = videoData.data.items[j].id;
         obj.suggest_url = `api/v1/suggest?url=${videoData.data.items[j].id}`;
         obj.stream_url = `api/v1/stream?url=${videoData.data.items[j].id}`;
         obj.get_url = `api/v1/download?url=${videoData.data.items[j].id}`;
@@ -78,6 +79,8 @@ module.exports.createPlaylistJson = async (json, playlistId) => {
           .duration(video.data.items[j].contentDetails.duration)
           .asMinutes()
           .toFixed(2);
+        // let uploader = json[i].snippet.channelTitle.split("-");
+        let uploader = json[i].snippet.title.split("-");
 
         // Keep Youtube Playlist Music Detail
         await database.writeYoutubeDetail(
@@ -86,7 +89,7 @@ module.exports.createPlaylistJson = async (json, playlistId) => {
           json[i].snippet.title,
           json[i].snippet.description,
           json[i].snippet.thumbnails.medium.url,
-          json[i].snippet.channelTitle,
+          uploader[0],
           duration,
           video.data.items[j].statistics.viewCount,
           date

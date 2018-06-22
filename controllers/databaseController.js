@@ -77,6 +77,9 @@ module.exports.readAllPlaylistData = async (select, status) => {
 
     // Query Database
     const [rows, fields] = await connection.execute(query, [status]);
+
+    connection.close();
+
     return rows;
   } catch (error) {
     return Promise.reject(error);
@@ -99,6 +102,9 @@ module.exports.readPlaylistDataByName = async (select, name, status) => {
 
     // Query Database
     const [rows, fields] = await connection.execute(query, [name, status]);
+
+    connection.close();
+
     return rows;
   } catch (error) {
     return Promise.reject(error);
@@ -124,6 +130,9 @@ module.exports.readYoutubeDataById = async (select, playlistId, status) => {
       playlistId,
       status
     ]);
+
+    connection.close();
+
     return rows;
   } catch (error) {
     return Promise.reject(error);
@@ -149,6 +158,9 @@ module.exports.readAllYoutubeData = async (select, status) => {
       playlistId,
       status
     ]);
+
+    connection.close();
+
     return rows;
   } catch (error) {
     return Promise.reject(error);
@@ -181,7 +193,7 @@ module.exports.writeYoutubeDetail = async (
       "INSERT INTO `youtube_collections` (`youtube_id`, `playlist_id`, `title`, `description`, `thumb`,`uploader`,`duration`,`views`,`published_at`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     // Query Database
-    return await connection.execute(query, [
+    const row = await connection.execute(query, [
       youtubeId,
       playlistId,
       title,
@@ -194,6 +206,10 @@ module.exports.writeYoutubeDetail = async (
       now,
       now
     ]);
+
+    connection.close();
+
+    return row;
   } catch (error) {
     return Promise.reject(error);
   }
@@ -215,7 +231,11 @@ module.exports.deactivateYoutubeBYPlaylistId = async (playlistId, status) => {
       "UPDATE `youtube_collections` SET `status`=?, `updated_at`=? WHERE `playlist_id`=?";
 
     // Query Database
-    return await connection.execute(query, [status, now, playlistId]);
+    const row = await connection.execute(query, [status, now, playlistId]);
+
+    connection.close();
+
+    return row;
   } catch (error) {
     return Promise.reject(error);
   }

@@ -86,6 +86,7 @@ module.exports.requestPlaylistData = (req, res) => {
         .send(createJsonObject(result, "api/v1/playlist", 200, metadata));
     })
     .catch(error => {
+      console.log(error);
       return res.status(400).send("Oops our bad!!!");
     });
 };
@@ -107,6 +108,7 @@ module.exports.requestTrendingData = (req, res) => {
           .send(createJsonObject(result, "api/v1/trending", 200, metadata));
       })
       .catch(error => {
+        console.log(error);
         return res.status(400).send("Oops our bad!!!");
       });
   } else {
