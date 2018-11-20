@@ -253,6 +253,7 @@ When deploy production initialize the `APP_ENV` `prod`
 >DB_PORT=3306
 >DB_DRIVER=mysql
 
+>YOUTUBE_API_KEY=""
 >PRODUCTION_URL=""
 >DEVELOPMENT_URL=http://localhost::8080/
 ```
