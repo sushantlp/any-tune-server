@@ -113,17 +113,16 @@ if (process.env.APP_ENV.toUpperCase() == "PROD") {
   });
 }
 
-// new CronJob(
-//   "30 * * * * *",
-//   function() {
-//     // Execute code here
-//     cron.logicCronScheduling();
-//     console.log("Hello");
-//   },
-//   null,
-//   true,
-//   "Asia/Kolkata"
-// );
+new CronJob(
+  "* * * 1 * *",
+  function() {
+    // Execute code here
+    cron.logicCronScheduling();
+  },
+  null,
+  true,
+  "Asia/Kolkata"
+);
 
 // Export
 module.exports = app;
