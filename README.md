@@ -49,12 +49,12 @@ Example -
 
       	| Term | Explanation |
       	|-----------|--------------|
-      	|`q`| Search query.|
+      	|`type`| Search query.|
 
       	Example -
       	```json
       	{
-      		"q": "Bass%20Rani"
+      		"type": "Bass%20Rani"
       	}
       	```
 
@@ -69,7 +69,7 @@ Example -
       	```json
       	{
       		"metadata": {
-      			"q": "Bass%20Rani",
+      			"type": "Bass%20Rani",
       			"count": 3
       		},
       		"results" : [
@@ -193,17 +193,6 @@ Example -
       	}
       	```
 
-- ### Downloading from URL provided
-
-      	* **Type**: `GET`
-      	* **Location**: `/api/v1/d`
-      	* **Parameters**:
-
-      		| Term | Explanation |
-      		|------|--------------|
-      		|`url` | Encrypted URL as recieved from `/api/v1/g`|
-      	* **Response**: Audio file.
-
 - ### Getting supported Playlists
 
       	* **Type**: `GET`
@@ -230,82 +219,6 @@ Example -
       				"playlist": "latest",
       				"url": "https://www.youtube.com/playlist?list=PLFgquLnL59akA2PflFpeQG9L01VFg90wS'"
       			}
-      		]
-      	}
-      	```
-
-- ### Streaming content
-
-      	* **Type**: `GET`
-      	* **Location**: `/api/v1/stream`
-      	* **Parameters**:
-
-      		| Term | Explanation |
-      		|------|--------------|
-      		|`url`| Encoded URL as recieved from the search|
-
-      	* **Response**:
-
-
-    | Term | Explanation |
-    |------|--------------|
-    |`status`| Status code |
-    |`url`| Url to stream from |
-
-    Example -
-    ```json
-    {
-    	"status": 200,
-    	"url": "/api/v1/stream_handler?url=asfj2jJSAJDAJASKK898989"
-    }
-    ```
-
-- ### Getting related videos
-
-      	* **Type**: `GET`
-      	* **Location**: `/api/v1/suggest`
-      	* **Parameters**:
-
-      		| Term | Explanation |
-      		|------|-------------|
-      		|`url`| Encoded URL as recieved from search. |
-
-      	* **Response**:
-
-      	|`Term`| Explanation |
-      	|------|-------------|
-      	|`metadata`| Contains following terms:<br/>&nbsp;&nbsp;&nbsp;&nbsp;`count`: Number of results shown.|
-      	|`results`| Actual result set contains a list of items with following attributes : <br/>&nbsp;&nbsp;&nbsp;&nbsp;`get_url`: URL to get song from.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`id`: Youtube ID of video.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`title`: Title of video.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`length`: Length of video.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`thumb`: Link to video thumbnail.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`uploader`: Youtube uploader ID.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`views`: View count for the video.<br/>&nbsp;&nbsp;&nbsp;&nbsp;`suggest_url`: URL to get suggested songs from.|
-
-      	Example -
-      	```json
-      	{
-      		"metadata": {
-      			"count": 2
-      		},
-      		"results": [
-      				{
-      					"get_url": "/api/v1/g?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8=",
-      					"id": "slNebO7Yips",
-      					"length": "4:34",
-      					"thumb": "https://img.youtube.com/vi/slNebO7Yips/0.jpg",
-      					"title": "Nucleya - BASS Rani - Aaja feat Avneet Khurmi &amp; Guri Gangsta",
-      					"uploader": "NUCLEYA",
-      					"stream_url": "/api/v1/stream?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8=",
-      					"views": "1,078,918",
-      					"suggest_url": "/api/v1/suggest?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8="
-      				},
-      				{
-      					"get_url": "/api/v1/g?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8=",
-      					"id": "slNebO7Yips",
-      					"length": "4:34",
-      					"thumb": "https://img.youtube.com/vi/slNebO7Yips/0.jpg",
-      					"title": "Nucleya - BASS Rani - Aaja feat Avneet Khurmi &amp; Guri Gangsta",
-      					"stream_url": "/api/v1/stream?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8=",
-      					"uploader": "NUCLEYA",
-      					"views": "1,078,918",
-      					"suggest_url": "/api/v1/suggest?url=fSRrZiQ8IiR1blBnZFE5W2tydSQuIiR2a3ZuZyQ8IiRQd2VuZ3tjIi8iRENVVSJUY3BrIi8iQ2NsYyJoZ2N2IkN4cGdndiJNand0b2siKGNvcj0iSXd0ayJJY3BpdXZjJH8="
-      				}
       		]
       	}
       	```
