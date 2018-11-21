@@ -238,12 +238,14 @@ Example -
 > sequelize db:migrate
 > node server.js
 ```
-# Execute Playlist Seed
+
+# To get started, try installing the seed:
 
 ```
 sequelize db:seed --seed 20180606133445-youtube-playlist
 
 ```
+
 ## Configuring .env file
 
 When deploy production initialize the `APP_ENV` `prod`
